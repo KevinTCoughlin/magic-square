@@ -22,8 +22,8 @@ var new_game_btn: Button = $VBoxContainer/CenterContainer/GamePanel/MarginContai
 var sum_indicators: Control = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/SumIndicators
 
 var generator: RefCounted
-var current_puzzle: Dictionary
-var cells: Array = []
+var current_puzzle: Dictionary[String, Variant] = {}
+var cells: Array[Node] = []
 var current_seed: int = -1
 var puzzle_start_time: float = 0.0
 var puzzle_completed: bool = false

@@ -6,7 +6,7 @@ extends RefCounted
 
 enum Difficulty { EASY, MEDIUM, HARD }
 
-const DIFFICULTY_HIDDEN_COUNTS := {
+const DIFFICULTY_HIDDEN_COUNTS: Dictionary[Difficulty, Vector2i] = {
 	Difficulty.EASY: Vector2i(2, 3),
 	Difficulty.MEDIUM: Vector2i(4, 5),
 	Difficulty.HARD: Vector2i(6, 7),
@@ -24,8 +24,8 @@ func _init(seed_value: int = -1) -> void:
 
 
 ## Generate a puzzle with target sum N and specified difficulty.
-## Returns dictionary with 'solution', 'visible_mask', 'target_sum'.
-func generate(target_sum: int, difficulty: Difficulty) -> Dictionary:
+## Returns dictionary with 'solution', 'visible_mask', 'target_sum', 'difficulty'.
+func generate(target_sum: int, difficulty: Difficulty) -> Dictionary[String, Variant]:
 	var solution := _generate_magic_square(target_sum)
 	var visible_mask := _generate_visibility_mask(difficulty)
 
@@ -41,29 +41,29 @@ func generate(target_sum: int, difficulty: Difficulty) -> Dictionary:
 ## Magic constant for 3x3 using numbers 1-9 is 15.
 ## We scale/shift to achieve different target sums.
 func _generate_magic_square(target_sum: int) -> Array[int]:
-	# Base magic square (one of many valid arrangements)
-	var base_squares: Array[Array] = [
-		[2, 7, 6, 9, 5, 1, 4, 3, 8],
-		[2, 9, 4, 7, 5, 3, 6, 1, 8],
-		[4, 9, 2, 3, 5, 7, 8, 1, 6],
-		[6, 7, 2, 1, 5, 9, 8, 3, 4],
-		[6, 1, 8, 7, 5, 3, 2, 9, 4],
-		[8, 1, 6, 3, 5, 7, 4, 9, 2],
-		[8, 3, 4, 1, 5, 9, 6, 7, 2],
-		[4, 3, 8, 9, 5, 1, 2, 7, 6],
+	# Base magic squares stored as PackedInt32Array (contiguous memory)
+	var base_squares: Array[PackedInt32Array] = [
+		PackedInt32Array([2, 7, 6, 9, 5, 1, 4, 3, 8]),
+		PackedInt32Array([2, 9, 4, 7, 5, 3, 6, 1, 8]),
+		PackedInt32Array([4, 9, 2, 3, 5, 7, 8, 1, 6]),
+		PackedInt32Array([6, 7, 2, 1, 5, 9, 8, 3, 4]),
+		PackedInt32Array([6, 1, 8, 7, 5, 3, 2, 9, 4]),
+		PackedInt32Array([8, 1, 6, 3, 5, 7, 4, 9, 2]),
+		PackedInt32Array([8, 3, 4, 1, 5, 9, 6, 7, 2]),
+		PackedInt32Array([4, 3, 8, 9, 5, 1, 2, 7, 6]),
 	]
 
 	# Pick a random base square
-	var base: Array = base_squares[rng.randi() % base_squares.size()]
+	var base: PackedInt32Array = base_squares[rng.randi() % base_squares.size()]
 
 	# Base magic constant is 15. Scale to target.
 	# target_sum = 15 + offset * 3, so offset = (target_sum - 15) / 3
-	# We add 'offset' to each cell
 	var offset := (target_sum - 15) / 3
 
 	var result: Array[int] = []
-	for val in base:
-		result.append(val + offset)
+	result.resize(9)
+	for i in 9:
+		result[i] = base[i] + offset
 
 	return result
 
@@ -91,7 +91,7 @@ func _generate_visibility_mask(difficulty: Difficulty) -> Array[bool]:
 
 ## Generate with custom visibility (for advanced configuration).
 ## hidden_indices: array of cell indices (0-8) to hide.
-func generate_custom(target_sum: int, hidden_indices: Array[int]) -> Dictionary:
+func generate_custom(target_sum: int, hidden_indices: Array[int]) -> Dictionary[String, Variant]:
 	var solution := _generate_magic_square(target_sum)
 
 	var visible_mask: Array[bool] = []
@@ -115,6 +115,7 @@ func _shuffle_array(arr: Array) -> void:
 
 
 ## Validate that a grid satisfies magic square property.
+## Returns untyped Dictionary for property access compatibility (.valid, .rows, etc.)
 static func validate_solution(grid: Array[int], target_sum: int) -> Dictionary:
 	var results := {
 		"valid": true,
