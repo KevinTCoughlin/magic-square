@@ -14,6 +14,10 @@ var label: Label
 
 var _pending_setup: Dictionary = {}
 
+# Cached styles to avoid allocation on every highlight
+static var _style_correct: StyleBoxFlat
+static var _style_incorrect: StyleBoxFlat
+
 
 func _ready() -> void:
 	input = $LineEdit
@@ -70,11 +74,27 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 func set_highlight(is_correct: bool) -> void:
 	if is_editable and current_value > 0:
 		if is_correct:
-			add_theme_stylebox_override("panel", _create_style(Color(0.2, 0.6, 0.3, 0.3)))
+			add_theme_stylebox_override("panel", _get_correct_style())
 		else:
-			add_theme_stylebox_override("panel", _create_style(Color(0.7, 0.2, 0.2, 0.3)))
+			add_theme_stylebox_override("panel", _get_incorrect_style())
 	else:
 		remove_theme_stylebox_override("panel")
+
+
+static func _get_correct_style() -> StyleBoxFlat:
+	if not _style_correct:
+		_style_correct = StyleBoxFlat.new()
+		_style_correct.bg_color = Color(0.2, 0.6, 0.3, 0.3)
+		_style_correct.set_corner_radius_all(4)
+	return _style_correct
+
+
+static func _get_incorrect_style() -> StyleBoxFlat:
+	if not _style_incorrect:
+		_style_incorrect = StyleBoxFlat.new()
+		_style_incorrect.bg_color = Color(0.7, 0.2, 0.2, 0.3)
+		_style_incorrect.set_corner_radius_all(4)
+	return _style_incorrect
 
 
 func clear_highlight() -> void:
@@ -140,8 +160,3 @@ func _navigate(offset: int) -> void:
 					target_cell.input.grab_focus()
 
 
-func _create_style(color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.set_corner_radius_all(4)
-	return style

@@ -189,18 +189,21 @@ func _resume_session() -> void:
 
 
 func _setup_grid() -> void:
-	# Clear existing cells
-	for cell in cells:
-		cell.queue_free()
-	cells.clear()
+	# Pool cells: reuse existing, create only if needed
+	var need_cells := 9 - cells.size()
 
-	# Create new cells
-	for i in 9:
-		var cell = CellScene.instantiate()
-		cell.setup(i, current_puzzle.solution[i], not current_puzzle.visible_mask[i])
+	# Create missing cells (first run only)
+	for i in need_cells:
+		var cell := CellScene.instantiate()
 		cell.value_changed.connect(_on_cell_value_changed)
 		grid_container.add_child(cell)
 		cells.append(cell)
+
+	# Reset all cells with new puzzle data
+	for i in 9:
+		var cell: Node = cells[i]
+		cell.clear_highlight()
+		cell.setup(i, current_puzzle.solution[i], not current_puzzle.visible_mask[i])
 
 
 func _on_cell_value_changed(_cell_index: int, _new_value: int) -> void:
