@@ -3,13 +3,20 @@ extends Control
 const CellScene := preload("res://cell.tscn")
 const PuzzleGen := preload("res://puzzle_generator.gd")
 
-@onready var grid_container: GridContainer = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/GridContainer
-@onready var target_label: Label = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/TargetLabel
-@onready var status_label: Label = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/StatusLabel
-@onready var difficulty_option: OptionButton = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/DifficultyOption
-@onready var seed_input: LineEdit = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/SeedInput
-@onready var new_game_btn: Button = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/NewGameBtn
-@onready var sum_indicators: Control = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/SumIndicators
+@onready
+var grid_container: GridContainer = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/GridContainer
+@onready
+var target_label: Label = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/TargetLabel
+@onready
+var status_label: Label = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/StatusLabel
+@onready
+var difficulty_option: OptionButton = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/DifficultyOption
+@onready
+var seed_input: LineEdit = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/SeedInput
+@onready
+var new_game_btn: Button = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/HBoxContainer/NewGameBtn
+@onready
+var sum_indicators: Control = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/SumIndicators
 
 var generator: RefCounted
 var current_puzzle: Dictionary
@@ -93,11 +100,7 @@ func _setup_grid() -> void:
 	# Create new cells
 	for i in 9:
 		var cell = CellScene.instantiate()
-		cell.setup(
-			i,
-			current_puzzle.solution[i],
-			not current_puzzle.visible_mask[i]
-		)
+		cell.setup(i, current_puzzle.solution[i], not current_puzzle.visible_mask[i])
 		cell.value_changed.connect(_on_cell_value_changed)
 		grid_container.add_child(cell)
 		cells.append(cell)

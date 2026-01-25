@@ -31,7 +31,7 @@ func setup(index: int, value: int, editable: bool) -> void:
 	is_editable = editable
 
 	if not is_node_ready():
-		_pending_setup = { "index": index, "value": value, "editable": editable }
+		_pending_setup = {"index": index, "value": value, "editable": editable}
 		return
 
 	_apply_setup(index, value, editable)

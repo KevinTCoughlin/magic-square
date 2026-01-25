@@ -1,33 +1,50 @@
-# Godot 4+ specific ignores
+# Godot 4+
 .godot/
-
-# Godot-specific ignores
-*.translation
-
-# Imported textures and samples
 .import/
 
-# Mono-specific ignores
+# Godot misc
+*.translation
+*.mo
+
+# Mono/C#
 .mono/
 data_*/
 mono_crash.*.json
 
-# Export templates
-*.pck
-*.zip
-
-# Build artifacts
+# Export/Build
 export/
 builds/
+*.pck
 *.exe
 *.x86_64
 *.app
+*.dmg
+*.apk
+*.aab
 
-# OS files
+# Python (gdtoolkit)
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+
+# OS
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Editor backups
+# Editors
 *~
 *.swp
+*.swo
+.idea/
+*.sublime-*
+.vscode/
+
+# Claude Code
 .claude/
+
+# Logs
+*.log
+godot.log

@@ -1,0 +1,48 @@
+[project]
+name = "magic-square"
+version = "0.1.0"
+description = "3x3 magic square puzzle game"
+requires-python = ">=3.10"
+
+[tool.gdlint]
+# GDScript linter configuration
+# See: https://github.com/Scony/godot-gdscript-toolkit
+
+# Disable specific rules if needed
+# disable = ["max-line-length"]
+
+# Max line length (default: 100)
+# max-line-length = 120
+
+# Class name regex pattern
+class-name-regex = "([A-Z][a-z0-9]*)+$"
+
+# Function name regex pattern
+function-name-regex = "(_?[a-z][a-z0-9]*(_[a-z0-9]+)*|_ready|_process|_physics_process|_input|_unhandled_input)$"
+
+# Private function regex pattern
+private-method-name-regex = "_[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+# Variable name regex pattern
+function-variable-name-regex = "[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+# Class variable regex pattern
+class-variable-name-regex = "(_?[a-z][a-z0-9]*(_[a-z0-9]+)*|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*)$"
+
+# Function argument regex pattern
+function-argument-name-regex = "_?[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+# Loop variable regex pattern
+loop-variable-name-regex = "_?[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+# Signal name regex pattern
+signal-name-regex = "[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+# Const naming convention (UPPER_SNAKE_CASE)
+const-name-regex = "[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"
+
+# Enum naming convention
+enum-name-regex = "([A-Z][a-z0-9]*)+$"
+
+# Enum element naming convention
+enum-element-name-regex = "[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"

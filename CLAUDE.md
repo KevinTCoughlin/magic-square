@@ -1,94 +1,126 @@
 # Magic Square Puzzle
 
-A Duolingo-inspired 3x3 math puzzle game built with Godot 4.3.
+A 3x3 math puzzle game built with Godot 4.3+ following open-source best practices.
 
-## Overview
+## Quick Reference
 
-Players fill in missing numbers in a 3x3 grid where all rows, columns, and diagonals must sum to a target number N. This is a "magic square" puzzle with configurable difficulty and seeding.
+```bash
+just          # List commands
+just run      # Run game
+just check    # Format + lint
+just setup    # Install dev deps
+```
 
 ## Architecture
 
 ```
-game.tscn / game.gd      # Main game controller, UI layout
-cell.tscn / cell.gd      # Individual grid cell (input or fixed value)
-puzzle_generator.gd      # Core puzzle generation logic
+├── game.gd / game.tscn      # Main controller, UI
+├── cell.gd / cell.tscn      # Grid cell (input/display)
+├── puzzle_generator.gd      # Magic square generation
+├── Justfile                 # Task runner
+├── .pre-commit-config.yaml  # Git hooks
+└── .github/workflows/       # CI pipeline
 ```
 
-## Key Classes
+## Key Patterns
 
-### PuzzleGenerator
+### Static Typing (Enforced)
 
-Generates valid magic square puzzles with:
-- Configurable seed for reproducible puzzles
-- Three difficulty levels controlling hidden cell count
-- Target sum scaling (base magic constant 15, offset for other values)
+Project enables strict GDScript warnings:
+- `untyped_declaration` - Warn on missing types
+- `unsafe_property_access` - Warn on dynamic access
+- `unsafe_method_access` - Warn on untyped method calls
 
 ```gdscript
-var gen := PuzzleGenerator.new(seed)
-var puzzle := gen.generate(target_sum, PuzzleGenerator.Difficulty.MEDIUM)
-# Returns: { solution: Array[int], visible_mask: Array[bool], target_sum: int }
+# Good
+var cells: Array[Cell] = []
+func calculate(value: int) -> int:
+
+# Avoid
+var cells = []
+func calculate(value):
 ```
 
-### Difficulty Levels
+### Deferred Setup Pattern
 
-| Level  | Hidden Cells |
-|--------|--------------|
-| EASY   | 2-3          |
-| MEDIUM | 4-5          |
-| HARD   | 6-7          |
+Cells use deferred setup for nodes not yet in tree:
 
-### Cell
+```gdscript
+func setup(index: int, value: int, editable: bool) -> void:
+    if not is_node_ready():
+        _pending_setup = {"index": index, "value": value, "editable": editable}
+        return
+    _apply_setup(index, value, editable)
 
-Individual grid cell with:
-- Editable mode (LineEdit) for player input
-- Fixed mode (Label) for given values
-- Arrow key navigation between cells
-- Visual feedback for correct/incorrect values
+func _ready() -> void:
+    if not _pending_setup.is_empty():
+        _apply_setup(...)
+```
 
-## Game Flow
+### Preload for Type Safety
 
-1. Generator creates a valid magic square solution
-2. Visibility mask determines which cells are hidden
-3. Player fills in hidden cells
-4. Real-time validation shows row/col/diagonal sums
-5. Victory when all sums match target
+Use `const` preloads instead of `class_name` for reliable cross-file references:
+
+```gdscript
+const CellScene := preload("res://cell.tscn")
+const PuzzleGen := preload("res://puzzle_generator.gd")
+```
+
+## Puzzle Generation
+
+Magic squares use base patterns with offset scaling:
+
+```gdscript
+# Base magic constant = 15 (sum of 1-9 divided by 3)
+# For target N: offset = (N - 15) / 3
+# Add offset to each cell
+
+var gen := PuzzleGen.new(seed)
+var puzzle := gen.generate(target_sum, PuzzleGen.Difficulty.MEDIUM)
+```
+
+## Difficulty Levels
+
+| Level  | Hidden | Strategy |
+|--------|--------|----------|
+| EASY   | 2-3    | Given cells reveal pattern |
+| MEDIUM | 4-5    | Some deduction required |
+| HARD   | 6-7    | Full constraint solving |
+
+## Development Workflow
+
+```bash
+# Setup (once)
+just setup
+
+# Before commit (auto via pre-commit)
+just check
+
+# Watch mode
+just watch
+
+# Format only
+just fmt
+```
+
+## CI Pipeline
+
+GitHub Actions runs on push/PR:
+1. **Lint** - gdformat + gdlint
+2. **Validate** - Godot project import check
 
 ## Conventions
 
 - GDScript 4.x with static typing
-- Signals for cell value changes
-- RefCounted for utility classes (PuzzleGenerator)
-- Preload for scene references
+- Signals for loose coupling
+- Conventional commits
+- Pre-commit hooks enforced
+- MIT licensed
 
-## Commands
+## Future Considerations
 
-```bash
-# Run game (requires Godot 4.3+)
-godot --path . game.tscn
-
-# Run headless (for testing)
-godot --headless --path . --script res://puzzle_generator.gd
-```
-
-## Testing Puzzle Generation
-
-```gdscript
-# In REPL or test script
-var gen := PuzzleGenerator.new(42)  # Fixed seed
-var p := gen.generate(15, PuzzleGenerator.Difficulty.EASY)
-print(p.solution)      # [2, 7, 6, 9, 5, 1, 4, 3, 8] (varies by seed)
-print(p.visible_mask)  # [true, false, true, true, true, true, false, true, true]
-
-# Validate any grid
-var result := PuzzleGenerator.validate_solution(grid, 15)
-print(result.valid, result.rows, result.cols, result.diagonals)
-```
-
-## Future Enhancements
-
-- [ ] Timer/scoring system
-- [ ] Hint system (reveal one cell)
-- [ ] Multiple grid sizes (4x4, 5x5)
-- [ ] Sound effects
-- [ ] Save/load progress
-- [ ] Leaderboards per seed
+- [ ] Autoload for game state persistence
+- [ ] Resource files for puzzle definitions
+- [ ] Unit tests via GUT framework
+- [ ] Localization support (TranslationServer)
+- [ ] Accessibility (screen reader, high contrast)
