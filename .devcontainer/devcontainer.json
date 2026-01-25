@@ -1,14 +1,17 @@
 {
-	"name": "Magic Square - Godot 4.5",
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+	"name": "Magic Square",
+	"image": "mcr.microsoft.com/devcontainers/base:debian",
 
 	"features": {
 		"ghcr.io/devcontainers/features/python:1": {
-			"version": "3.12"
+			"version": "3.12",
+			"installTools": false
 		},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {
-			"configureZshAsDefaultShell": true
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": false,
+			"installOhMyZshConfig": false
 		}
 	},
 
@@ -16,30 +19,30 @@
 
 	"customizations": {
 		"vscode": {
-			"extensions": [
-				"geequlim.godot-tools",
-				"alfish.godot-files",
-				"neikeq.godot-csharp-vscode"
-			],
 			"settings": {
 				"godotTools.editorPath.godot4": "/usr/local/bin/godot",
-				"editor.formatOnSave": true
+				"editor.formatOnSave": true,
+				"editor.tabSize": 4,
+				"editor.insertSpaces": false,
+				"files.trimTrailingWhitespace": true,
+				"files.insertFinalNewline": true
 			}
 		},
 		"codespaces": {
-			"openFiles": ["game.gd", "CLAUDE.md"]
+			"openFiles": ["game.gd"]
 		}
 	},
 
 	"forwardPorts": [6007],
 	"portsAttributes": {
 		"6007": {
-			"label": "Godot Language Server",
+			"label": "Godot LSP",
 			"onAutoForward": "silent"
 		}
 	},
 
 	"remoteEnv": {
-		"GODOT_VERSION": "4.5.1-stable"
+		"GODOT_VERSION": "4.5.1-stable",
+		"EDITOR": "vim"
 	}
 }
