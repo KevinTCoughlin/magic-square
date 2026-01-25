@@ -16,3 +16,13 @@ COL,C%d,S%d
 DIAG_MAIN,D\,D\
 DIAG_ANTI,D/,D/
 INSTRUCTIONS,"Arrow keys to navigate, numbers to fill","Pfeiltasten zum Navigieren, Zahlen zum Ausfuellen"
+A11Y_DIFFICULTY,Difficulty selector,Schwierigkeitsauswahl
+A11Y_SEED,"Puzzle seed input, optional","Puzzle-Seed-Eingabe, optional"
+A11Y_NEW_GAME,Start new game button,Neues Spiel starten
+A11Y_TARGET,Target sum display,Zielsummenanzeige
+A11Y_STATUS,Game status,Spielstatus
+A11Y_GRID,"Puzzle grid, 3 by 3","Puzzleraster, 3 mal 3"
+A11Y_CELL_POS,"Row %d, Column %d","Zeile %d, Spalte %d"
+A11Y_CELL_EMPTY,empty,leer
+A11Y_CELL_VALUE,value %d,Wert %d
+A11Y_CELL_ENTER,enter a number,Zahl eingeben

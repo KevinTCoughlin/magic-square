@@ -37,6 +37,7 @@ var diag_sums: Array[Label] = []
 func _ready() -> void:
 	_apply_locale()
 	_apply_theme()
+	_setup_accessibility()
 	_setup_difficulty_options()
 	_setup_sum_indicators()
 	_setup_focus_neighbors()
@@ -64,6 +65,16 @@ func _apply_theme() -> void:
 func set_high_contrast(enabled: bool) -> void:
 	GameState.set_setting("high_contrast", enabled)
 	_apply_theme()
+
+
+func _setup_accessibility() -> void:
+	# Godot 4.5+ screen reader support via AccessKit
+	difficulty_option.set_accessibility_name(tr("A11Y_DIFFICULTY"))
+	seed_input.set_accessibility_name(tr("A11Y_SEED"))
+	new_game_btn.set_accessibility_name(tr("A11Y_NEW_GAME"))
+	target_label.set_accessibility_name(tr("A11Y_TARGET"))
+	status_label.set_accessibility_name(tr("A11Y_STATUS"))
+	grid_container.set_accessibility_name(tr("A11Y_GRID"))
 
 
 func _setup_difficulty_options() -> void:

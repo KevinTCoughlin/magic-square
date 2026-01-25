@@ -45,7 +45,7 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 	# Accessibility: set descriptive name based on grid position
 	var row: int = cell_index / 3 + 1
 	var col: int = cell_index % 3 + 1
-	var position_desc := "Row %d, Column %d" % [row, col]
+	var position_desc := tr("A11Y_CELL_POS") % [row, col]
 
 	if editable:
 		label.hide()
@@ -53,13 +53,17 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 		input.text = ""
 		input.editable = true
 		input.placeholder_text = "?"
-		input.tooltip_text = "%s - Enter a number" % position_desc
+		input.tooltip_text = "%s - %s" % [position_desc, tr("A11Y_CELL_ENTER")]
+		# Godot 4.5+ screen reader support
+		input.set_accessibility_name("%s, %s, %s" % [position_desc, tr("A11Y_CELL_EMPTY"), tr("A11Y_CELL_ENTER")])
 		current_value = 0
 	else:
 		input.hide()
 		label.show()
 		label.text = str(value)
-		label.tooltip_text = "%s - Value: %d" % [position_desc, value]
+		label.tooltip_text = "%s - %s" % [position_desc, tr("A11Y_CELL_VALUE") % value]
+		# Godot 4.5+ screen reader support
+		label.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_VALUE") % value])
 		current_value = value
 
 
@@ -93,7 +97,18 @@ func _on_text_changed(new_text: String) -> void:
 		input.caret_column = filtered.length()
 
 	current_value = int(filtered) if filtered.length() > 0 else 0
+	_update_accessibility_name()
 	value_changed.emit(cell_index, current_value)
+
+
+func _update_accessibility_name() -> void:
+	var row: int = cell_index / 3 + 1
+	var col: int = cell_index % 3 + 1
+	var position_desc := tr("A11Y_CELL_POS") % [row, col]
+	if current_value > 0:
+		input.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_VALUE") % current_value])
+	else:
+		input.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_EMPTY")])
 
 
 func _on_input_gui_input(event: InputEvent) -> void:
