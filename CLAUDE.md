@@ -137,6 +137,21 @@ GitHub Actions runs on push/PR:
 - Pre-commit hooks enforced
 - MIT licensed
 
+## Documentation Maintenance
+
+**IMPORTANT:** When making code changes that affect features, APIs, or behavior:
+
+1. Update `README.md` if user-facing features change
+2. Update this `CLAUDE.md` if architecture or patterns change
+3. Keep the "Implemented Features" checklist current
+4. Update translations in `translations/translations.csv` for new user-facing strings
+
+After significant changes, verify README reflects:
+- Current Godot version requirement
+- All available commands in Justfile
+- Platform support matrix
+- Feature list matches actual implementation
+
 ## Implemented Features
 
 - [x] Autoload for game state persistence

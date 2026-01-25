@@ -1,6 +1,7 @@
 # GDLint configuration
 # See: https://github.com/Scony/godot-gdscript-toolkit
 
-# Disable overly pedantic rules
-class-definitions-order: false  # Godot's @onready pattern breaks this
-max-line-length: 120            # 100 is too restrictive for @onready paths
+disable:
+  - class-definitions-order  # Godot's @onready pattern breaks this
+
+max-line-length: 150  # @onready paths can be long
