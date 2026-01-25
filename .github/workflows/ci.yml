@@ -105,12 +105,17 @@ jobs:
           mkdir -p builds/${{ matrix.platform }}
           godot --headless --export-release "${{ matrix.export_name }}" builds/${{ matrix.platform }}/${{ matrix.artifact }}
 
+      - name: Create zip archive
+        run: |
+          cd builds/${{ matrix.platform }}
+          zip -r ../magic-square-${{ matrix.platform }}.zip .
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}-build
-          path: builds/${{ matrix.platform }}/
-          retention-days: 1  # Minimal retention, release has permanent copies
+          path: builds/magic-square-${{ matrix.platform }}.zip
+          retention-days: 1
 
   release:
     name: Create Release
@@ -125,9 +130,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: builds/
+          merge-multiple: true
 
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: builds/**/*
+          files: builds/*.zip
           generate_release_notes: true
