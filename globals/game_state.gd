@@ -10,17 +10,18 @@ signal state_loaded
 signal state_saved
 
 # Session state (current puzzle in progress)
-var session: Dictionary[String, Variant] = {}
+# Note: Using untyped Dictionary for JSON compatibility
+var session: Dictionary = {}
 
 # Player statistics
-var stats: Dictionary[String, Variant] = {
+var stats: Dictionary = {
 	"completed": 0,
 	"attempted": 0,
 	"best_times": {},
 }
 
 # User settings
-var settings: Dictionary[String, Variant] = {
+var settings: Dictionary = {
 	"locale": "en",
 	"high_contrast": false,
 }
@@ -39,7 +40,7 @@ func _notification(what: int) -> void:
 
 
 ## Save current session (puzzle in progress)
-func save_session(puzzle: Dictionary[String, Variant], grid: Array[int], seed_value: int, difficulty: int) -> void:
+func save_session(puzzle: Dictionary, grid: Array[int], seed_value: int, difficulty: int) -> void:
 	session = {
 		"puzzle": puzzle,
 		"grid": grid,

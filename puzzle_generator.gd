@@ -25,7 +25,7 @@ func _init(seed_value: int = -1) -> void:
 
 ## Generate a puzzle with target sum N and specified difficulty.
 ## Returns dictionary with 'solution', 'visible_mask', 'target_sum', 'difficulty'.
-func generate(target_sum: int, difficulty: Difficulty) -> Dictionary[String, Variant]:
+func generate(target_sum: int, difficulty: Difficulty) -> Dictionary:
 	var solution := _generate_magic_square(target_sum)
 	var visible_mask := _generate_visibility_mask(difficulty)
 
@@ -91,7 +91,7 @@ func _generate_visibility_mask(difficulty: Difficulty) -> Array[bool]:
 
 ## Generate with custom visibility (for advanced configuration).
 ## hidden_indices: array of cell indices (0-8) to hide.
-func generate_custom(target_sum: int, hidden_indices: Array[int]) -> Dictionary[String, Variant]:
+func generate_custom(target_sum: int, hidden_indices: Array[int]) -> Dictionary:
 	var solution := _generate_magic_square(target_sum)
 
 	var visible_mask: Array[bool] = []
