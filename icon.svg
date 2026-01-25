@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <rect width="128" height="128" rx="16" fill="#1a1a2e"/>
+  <!-- Grid cells -->
   <g fill="none" stroke="#eee" stroke-width="2">
     <rect x="16" y="16" width="28" height="28" rx="4"/>
     <rect x="50" y="16" width="28" height="28" rx="4"/>
@@ -11,15 +12,25 @@
     <rect x="50" y="84" width="28" height="28" rx="4"/>
     <rect x="84" y="84" width="28" height="28" rx="4"/>
   </g>
-  <g font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#4ecdc4" text-anchor="middle">
-    <text x="30" y="36">2</text>
-    <text x="64" y="36">7</text>
-    <text x="98" y="36">6</text>
-    <text x="30" y="70">9</text>
-    <text x="64" y="70">5</text>
-    <text x="98" y="70">1</text>
-    <text x="30" y="104">4</text>
-    <text x="64" y="104">3</text>
-    <text x="98" y="104">8</text>
+  <!-- Given cells with darker grey background and # symbol -->
+  <g fill="#2a2a3e">
+    <rect x="17" y="17" width="26" height="26" rx="3"/>
+    <rect x="85" y="17" width="26" height="26" rx="3"/>
+    <rect x="85" y="51" width="26" height="26" rx="3"/>
+    <rect x="17" y="85" width="26" height="26" rx="3"/>
+    <rect x="85" y="85" width="26" height="26" rx="3"/>
+  </g>
+  <g font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">
+    <!-- Given cells: # in muted grey -->
+    <text x="30" y="35" fill="#6a6a8a">#</text>
+    <text x="98" y="35" fill="#6a6a8a">#</text>
+    <text x="98" y="69" fill="#6a6a8a">#</text>
+    <text x="30" y="103" fill="#6a6a8a">#</text>
+    <text x="98" y="103" fill="#6a6a8a">#</text>
+    <!-- Editable cells: ? in cyan -->
+    <text x="64" y="35" fill="#4ecdc4">?</text>
+    <text x="30" y="69" fill="#4ecdc4">?</text>
+    <text x="64" y="69" fill="#4ecdc4">?</text>
+    <text x="64" y="103" fill="#4ecdc4">?</text>
   </g>
 </svg>
