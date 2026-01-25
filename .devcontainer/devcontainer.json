@@ -1,0 +1,45 @@
+{
+	"name": "Magic Square - Godot 4.6",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.12"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"configureZshAsDefaultShell": true
+		}
+	},
+
+	"postCreateCommand": ".devcontainer/setup.sh",
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"geequlim.godot-tools",
+				"alfish.godot-files",
+				"neikeq.godot-csharp-vscode"
+			],
+			"settings": {
+				"godotTools.editorPath.godot4": "/usr/local/bin/godot",
+				"editor.formatOnSave": true
+			}
+		},
+		"codespaces": {
+			"openFiles": ["game.gd", "CLAUDE.md"]
+		}
+	},
+
+	"forwardPorts": [6007],
+	"portsAttributes": {
+		"6007": {
+			"label": "Godot Language Server",
+			"onAutoForward": "silent"
+		}
+	},
+
+	"remoteEnv": {
+		"GODOT_VERSION": "4.6-stable"
+	}
+}
