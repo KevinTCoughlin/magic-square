@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-GODOT_VERSION="${GODOT_VERSION:-4.6-stable}"
+GODOT_VERSION="${GODOT_VERSION:-4.5.1-stable}"
 GODOT_RELEASE_URL="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
 
 echo "==> Installing Godot ${GODOT_VERSION}..."

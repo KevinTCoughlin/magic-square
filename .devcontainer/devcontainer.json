@@ -1,5 +1,5 @@
 {
-	"name": "Magic Square - Godot 4.6",
+	"name": "Magic Square - Godot 4.5",
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
 
 	"features": {
@@ -40,6 +40,6 @@
 	},
 
 	"remoteEnv": {
-		"GODOT_VERSION": "4.6-stable"
+		"GODOT_VERSION": "4.5.1-stable"
 	}
 }
