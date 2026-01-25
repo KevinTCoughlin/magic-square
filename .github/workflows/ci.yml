@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GODOT_VERSION: "4.6-stable"
+  GODOT_VERSION: "4.5.1-stable"  # Latest stable with a11y APIs
 
 jobs:
   # Single job for all checks - saves runner startup time

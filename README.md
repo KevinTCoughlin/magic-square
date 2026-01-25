@@ -7,7 +7,7 @@ A 3x3 math puzzle game where all rows, columns, and diagonals must sum to the ta
 
 ## Requirements
 
-- [Godot 4.6+](https://godotengine.org/)
+- [Godot 4.5+](https://godotengine.org/)
 - [mise](https://mise.jdx.dev/) (optional, for dev tooling)
 - [just](https://github.com/casey/just) (optional, task runner)
 

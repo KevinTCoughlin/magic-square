@@ -15,7 +15,7 @@ config/description="A 3x3 math puzzle game where rows, columns, and diagonals su
 config/version="0.1.0"
 config/tags=PackedStringArray("puzzle", "math", "casual")
 run/main_scene="res://game.tscn"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -73,8 +73,6 @@ textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_2d=2
 
 # Intel Arc/Ultra GPU compatibility
-# D3D12 is default on Windows in Godot 4.6, good for Arc GPUs
-# Vulkan fallback available, ANGLE for GL compatibility layer
-rendering_device/driver.windows="d3d12"
+# Vulkan fallback for broad compatibility
 rendering_device/fallback_to_vulkan=true
 rendering_device/fallback_to_opengl3=true

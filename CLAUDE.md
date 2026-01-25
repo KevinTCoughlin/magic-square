@@ -1,6 +1,6 @@
 # Magic Square Puzzle
 
-A 3x3 math puzzle game built with Godot 4.6 following open-source best practices.
+A 3x3 math puzzle game built with Godot 4.5+ following open-source best practices.
 
 ## Quick Reference
 
