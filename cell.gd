@@ -65,7 +65,9 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 		input.placeholder_text = "?"
 		input.tooltip_text = "%s - %s" % [position_desc, tr(TR_CELL_ENTER)]
 		# Godot 4.5+ screen reader support
-		input.set_accessibility_name("%s, %s, %s" % [position_desc, tr(TR_CELL_EMPTY), tr(TR_CELL_ENTER)])
+		input.set_accessibility_name(
+			"%s, %s, %s" % [position_desc, tr(TR_CELL_EMPTY), tr(TR_CELL_ENTER)]
+		)
 		current_value = 0
 	else:
 		input.hide()
@@ -164,5 +166,3 @@ func _navigate(offset: int) -> void:
 				var target_cell := cells[target] as Cell
 				if target_cell.is_editable:
 					target_cell.input.grab_focus()
-
-
