@@ -1,6 +1,6 @@
 # Magic Square Puzzle
 
-A 3x3 math puzzle game built with Godot 4.3+ following open-source best practices.
+A 3x3 math puzzle game built with Godot 4.6 following open-source best practices.
 
 ## Quick Reference
 
@@ -17,8 +17,13 @@ just setup    # Install dev deps
 ├── game.gd / game.tscn      # Main controller, UI
 ├── cell.gd / cell.tscn      # Grid cell (input/display)
 ├── puzzle_generator.gd      # Magic square generation
+├── globals/game_state.gd    # Autoload: persistence, stats, settings
+├── resources/puzzle_config.gd  # Custom Resource for puzzles
+├── themes/                  # Default + high contrast themes
+├── translations/            # i18n (en, de)
+├── tests/                   # GUT unit tests
 ├── Justfile                 # Task runner
-├── .pre-commit-config.yaml  # Git hooks
+├── .devcontainer/           # Codespaces/devcontainer config
 └── .github/workflows/       # CI pipeline
 ```
 
@@ -106,8 +111,23 @@ just fmt
 ## CI Pipeline
 
 GitHub Actions runs on push/PR:
-1. **Lint** - gdformat + gdlint
-2. **Validate** - Godot project import check
+1. **Lint & Test** - gdformat, gdlint, GUT tests
+2. **Export** - Linux, Windows, macOS (on version tags)
+3. **Release** - Auto-create GitHub release with artifacts
+
+## Hardware Compatibility
+
+| Platform | Architecture | Renderer | Notes |
+|----------|--------------|----------|-------|
+| Windows | x64, ARM64 | D3D12 (default) | Intel Arc/Ultra, Snapdragon |
+| macOS | Universal | Metal via MoltenVK | Apple Silicon + Intel |
+| Linux | x64 | Vulkan | Fallback to GL Compatibility |
+
+**Intel Core Ultra / Arc GPU:**
+- D3D12 primary renderer (best Arc support)
+- Vulkan fallback available
+- ANGLE for OpenGL compatibility layer
+- Export includes D3D12 + ANGLE libraries
 
 ## Conventions
 
@@ -117,10 +137,12 @@ GitHub Actions runs on push/PR:
 - Pre-commit hooks enforced
 - MIT licensed
 
-## Future Considerations
+## Implemented Features
 
-- [ ] Autoload for game state persistence
-- [ ] Resource files for puzzle definitions
-- [ ] Unit tests via GUT framework
-- [ ] Localization support (TranslationServer)
-- [ ] Accessibility (screen reader, high contrast)
+- [x] Autoload for game state persistence
+- [x] Resource files for puzzle definitions
+- [x] Unit tests via GUT framework (14 tests)
+- [x] Localization support (en, de)
+- [x] Accessibility (screen reader, high contrast)
+- [x] Devcontainer / Codespaces support
+- [x] Windows ARM64 export
