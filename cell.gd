@@ -21,6 +21,10 @@ func _ready() -> void:
 	input.text_changed.connect(_on_text_changed)
 	input.gui_input.connect(_on_input_gui_input)
 
+	# Accessibility: ensure input is focusable
+	input.focus_mode = Control.FOCUS_ALL
+	focus_mode = Control.FOCUS_ALL
+
 	if not _pending_setup.is_empty():
 		_apply_setup(_pending_setup.index, _pending_setup.value, _pending_setup.editable)
 
@@ -38,16 +42,24 @@ func setup(index: int, value: int, editable: bool) -> void:
 
 
 func _apply_setup(_index: int, value: int, editable: bool) -> void:
+	# Accessibility: set descriptive name based on grid position
+	var row: int = cell_index / 3 + 1
+	var col: int = cell_index % 3 + 1
+	var position_desc := "Row %d, Column %d" % [row, col]
+
 	if editable:
 		label.hide()
 		input.show()
 		input.text = ""
 		input.editable = true
+		input.placeholder_text = "?"
+		input.tooltip_text = "%s - Enter a number" % position_desc
 		current_value = 0
 	else:
 		input.hide()
 		label.show()
 		label.text = str(value)
+		label.tooltip_text = "%s - Value: %d" % [position_desc, value]
 		current_value = value
 
 

@@ -1,0 +1,18 @@
+keys,en,de
+TITLE,Magic Square,Magisches Quadrat
+SUBTITLE,"Make all rows, columns, and diagonals sum to the target","Alle Zeilen, Spalten und Diagonalen sollen die Zielsumme ergeben"
+DIFFICULTY,Difficulty:,Schwierigkeit:
+EASY,Easy,Leicht
+MEDIUM,Medium,Mittel
+HARD,Hard,Schwer
+SEED,Seed:,Seed:
+NEW_GAME,New Game,Neues Spiel
+TARGET_SUM,Target Sum: %d,Zielsumme: %d
+STATUS_FILL,Fill in all cells,Alle Zellen ausfuellen
+STATUS_CORRECT,Correct! Well done!,Richtig! Gut gemacht!
+STATUS_WRONG,Not quite - check the sums,Nicht ganz - pruefe die Summen
+ROW,R%d,Z%d
+COL,C%d,S%d
+DIAG_MAIN,D\,D\
+DIAG_ANTI,D/,D/
+INSTRUCTIONS,"Arrow keys to navigate, numbers to fill","Pfeiltasten zum Navigieren, Zahlen zum Ausfuellen"

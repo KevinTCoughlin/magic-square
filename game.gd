@@ -2,6 +2,9 @@ extends Control
 
 const CellScene := preload("res://cell.tscn")
 const PuzzleGen := preload("res://puzzle_generator.gd")
+const PuzzleConfig := preload("res://resources/puzzle_config.gd")
+const DefaultTheme := preload("res://themes/default_theme.tres")
+const HighContrastTheme := preload("res://themes/high_contrast_theme.tres")
 
 @onready
 var grid_container: GridContainer = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/GridContainer
@@ -21,6 +24,9 @@ var sum_indicators: Control = $VBoxContainer/CenterContainer/GamePanel/MarginCon
 var generator: RefCounted
 var current_puzzle: Dictionary
 var cells: Array = []
+var current_seed: int = -1
+var puzzle_start_time: float = 0.0
+var puzzle_completed: bool = false
 
 # Sum indicator labels
 var row_sums: Array[Label] = []
@@ -29,18 +35,60 @@ var diag_sums: Array[Label] = []
 
 
 func _ready() -> void:
+	_apply_locale()
+	_apply_theme()
 	_setup_difficulty_options()
 	_setup_sum_indicators()
+	_setup_focus_neighbors()
 	new_game_btn.pressed.connect(_on_new_game_pressed)
-	_start_new_game()
+
+	if GameState.has_active_session():
+		_resume_session()
+	else:
+		_start_new_game()
+
+
+func _apply_locale() -> void:
+	var locale: String = GameState.get_setting("locale", "en")
+	TranslationServer.set_locale(locale)
+
+
+func _apply_theme() -> void:
+	var high_contrast: bool = GameState.get_setting("high_contrast", false)
+	if high_contrast:
+		theme = HighContrastTheme
+	else:
+		theme = DefaultTheme
+
+
+func set_high_contrast(enabled: bool) -> void:
+	GameState.set_setting("high_contrast", enabled)
+	_apply_theme()
 
 
 func _setup_difficulty_options() -> void:
 	difficulty_option.clear()
-	difficulty_option.add_item("Easy", PuzzleGen.Difficulty.EASY)
-	difficulty_option.add_item("Medium", PuzzleGen.Difficulty.MEDIUM)
-	difficulty_option.add_item("Hard", PuzzleGen.Difficulty.HARD)
+	difficulty_option.add_item(tr("EASY"), PuzzleGen.Difficulty.EASY)
+	difficulty_option.add_item(tr("MEDIUM"), PuzzleGen.Difficulty.MEDIUM)
+	difficulty_option.add_item(tr("HARD"), PuzzleGen.Difficulty.HARD)
 	difficulty_option.select(1)  # Default to Medium
+
+
+func _setup_focus_neighbors() -> void:
+	# Enable focus on all controls
+	difficulty_option.focus_mode = Control.FOCUS_ALL
+	seed_input.focus_mode = Control.FOCUS_ALL
+	new_game_btn.focus_mode = Control.FOCUS_ALL
+
+	# Set up horizontal focus flow: difficulty -> seed -> new game
+	difficulty_option.focus_neighbor_right = seed_input.get_path()
+	seed_input.focus_neighbor_left = difficulty_option.get_path()
+	seed_input.focus_neighbor_right = new_game_btn.get_path()
+	new_game_btn.focus_neighbor_left = seed_input.get_path()
+
+	# Wrap around
+	new_game_btn.focus_neighbor_right = difficulty_option.get_path()
+	difficulty_option.focus_neighbor_left = new_game_btn.get_path()
 
 
 func _setup_sum_indicators() -> void:
@@ -73,11 +121,15 @@ func _setup_sum_indicators() -> void:
 
 
 func _start_new_game() -> void:
+	puzzle_completed = false
+	puzzle_start_time = Time.get_ticks_msec() / 1000.0
+
 	# Parse seed
 	var seed_val := -1
 	if seed_input.text.length() > 0 and seed_input.text.is_valid_int():
 		seed_val = int(seed_input.text)
 
+	current_seed = seed_val
 	generator = PuzzleGen.new(seed_val)
 
 	# Generate target sum (multiple of 3, between 12 and 30 for reasonable numbers)
@@ -87,7 +139,41 @@ func _start_new_game() -> void:
 	var difficulty: int = difficulty_option.get_selected_id()
 	current_puzzle = generator.generate(target_sum, difficulty)
 
+	GameState.record_attempt()
 	_setup_grid()
+	_update_display()
+	_save_current_session()
+
+
+func _resume_session() -> void:
+	puzzle_completed = false
+	puzzle_start_time = Time.get_ticks_msec() / 1000.0
+
+	var session: Dictionary = GameState.session
+	current_puzzle = session.get("puzzle", {})
+	current_seed = session.get("seed", -1)
+	var saved_grid: Array = session.get("grid", [])
+	var difficulty: int = session.get("difficulty", PuzzleGen.Difficulty.MEDIUM)
+
+	# Restore difficulty selection
+	for i in difficulty_option.item_count:
+		if difficulty_option.get_item_id(i) == difficulty:
+			difficulty_option.select(i)
+			break
+
+	# Restore seed input
+	if current_seed >= 0:
+		seed_input.text = str(current_seed)
+
+	_setup_grid()
+
+	# Restore saved values to editable cells
+	if saved_grid.size() == 9:
+		for i in 9:
+			if cells[i].is_editable and saved_grid[i] > 0:
+				cells[i].input.text = str(saved_grid[i])
+				cells[i].current_value = saved_grid[i]
+
 	_update_display()
 
 
@@ -108,11 +194,22 @@ func _setup_grid() -> void:
 
 func _on_cell_value_changed(_cell_index: int, _new_value: int) -> void:
 	_update_display()
+	if not puzzle_completed:
+		_save_current_session()
+
+
+func _save_current_session() -> void:
+	var current_grid: Array[int] = []
+	for cell in cells:
+		current_grid.append(cell.get_value())
+
+	var difficulty: int = difficulty_option.get_selected_id()
+	GameState.save_session(current_puzzle, current_grid, current_seed, difficulty)
 
 
 func _update_display() -> void:
 	var target: int = current_puzzle.target_sum
-	target_label.text = "Target Sum: %d" % target
+	target_label.text = tr("TARGET_SUM") % target
 
 	# Get current grid values
 	var current_grid: Array[int] = []
@@ -132,16 +229,21 @@ func _update_display() -> void:
 	if all_filled:
 		var validation: Dictionary = PuzzleGen.validate_solution(current_grid, target)
 		if validation.valid:
-			status_label.text = "Correct! Well done!"
+			status_label.text = tr("STATUS_CORRECT")
 			status_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.3))
+			if not puzzle_completed:
+				puzzle_completed = true
+				var elapsed := (Time.get_ticks_msec() / 1000.0) - puzzle_start_time
+				var difficulty: int = difficulty_option.get_selected_id()
+				GameState.record_completion(difficulty, elapsed)
 		else:
-			status_label.text = "Not quite - check the sums"
+			status_label.text = tr("STATUS_WRONG")
 			status_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.3))
 
 		# Highlight cells based on validation
 		_highlight_cells(validation)
 	else:
-		status_label.text = "Fill in all cells"
+		status_label.text = tr("STATUS_FILL")
 		status_label.remove_theme_color_override("font_color")
 		for cell in cells:
 			cell.clear_highlight()
@@ -151,20 +253,20 @@ func _update_sum_indicators(grid: Array[int], target: int) -> void:
 	# Row sums
 	for row in 3:
 		var sum := grid[row * 3] + grid[row * 3 + 1] + grid[row * 3 + 2]
-		row_sums[row].text = "R%d: %d" % [row + 1, sum]
+		row_sums[row].text = "%s: %d" % [tr("ROW") % (row + 1), sum]
 		_color_sum_label(row_sums[row], sum, target)
 
 	# Column sums
 	for col in 3:
 		var sum := grid[col] + grid[col + 3] + grid[col + 6]
-		col_sums[col].text = "C%d: %d" % [col + 1, sum]
+		col_sums[col].text = "%s: %d" % [tr("COL") % (col + 1), sum]
 		_color_sum_label(col_sums[col], sum, target)
 
 	# Diagonal sums
 	var diag1 := grid[0] + grid[4] + grid[8]
 	var diag2 := grid[2] + grid[4] + grid[6]
-	diag_sums[0].text = "D\\: %d" % diag1
-	diag_sums[1].text = "D/: %d" % diag2
+	diag_sums[0].text = "%s: %d" % [tr("DIAG_MAIN"), diag1]
+	diag_sums[1].text = "%s: %d" % [tr("DIAG_ANTI"), diag2]
 	_color_sum_label(diag_sums[0], diag1, target)
 	_color_sum_label(diag_sums[1], diag2, target)
 
@@ -188,6 +290,30 @@ func _highlight_cells(_validation: Dictionary) -> void:
 
 func _on_new_game_pressed() -> void:
 	_start_new_game()
+
+
+## Load a puzzle from a PuzzleConfig resource file.
+func load_puzzle_from_resource(config: Resource) -> void:
+	if not config or not config.is_valid():
+		push_warning("Invalid PuzzleConfig resource")
+		return
+
+	puzzle_completed = false
+	puzzle_start_time = Time.get_ticks_msec() / 1000.0
+	current_seed = -1
+	current_puzzle = config.to_puzzle_dict()
+
+	# Update difficulty selection to match
+	for i in difficulty_option.item_count:
+		if difficulty_option.get_item_id(i) == current_puzzle.difficulty:
+			difficulty_option.select(i)
+			break
+
+	seed_input.text = ""
+	GameState.record_attempt()
+	_setup_grid()
+	_update_display()
+	_save_current_session()
 
 
 func _input(event: InputEvent) -> void:

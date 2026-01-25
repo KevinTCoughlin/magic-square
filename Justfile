@@ -40,6 +40,14 @@ lint:
 # Run all checks (format + lint)
 check: fmt-check lint
 
+# Run unit tests via GUT (requires GUT plugin installed)
+test:
+    godot --headless --script addons/gut/gut_cmdln.gd
+
+# Run tests with verbose output
+test-verbose:
+    godot --headless --script addons/gut/gut_cmdln.gd -glog=2
+
 # Fix formatting and run lint
 fix: fmt lint
 
@@ -62,10 +70,15 @@ export-macos:
     @mkdir -p builds/macos
     godot --headless --export-release "macOS" builds/macos/magic-square.app
 
-# Export for Windows
+# Export for Windows (x64)
 export-windows:
     @mkdir -p builds/windows
     godot --headless --export-release "Windows Desktop" builds/windows/magic-square.exe
+
+# Export for Windows ARM64 (Snapdragon)
+export-windows-arm64:
+    @mkdir -p builds/windows-arm64
+    godot --headless --export-release "Windows Desktop ARM64" builds/windows-arm64/magic-square.exe
 
 # Watch for changes and run checks (requires entr)
 watch:
