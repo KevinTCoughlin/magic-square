@@ -3,8 +3,29 @@ extends Control
 const CellScene := preload("res://cell.tscn")
 const PuzzleGen := preload("res://puzzle_generator.gd")
 const PuzzleConfig := preload("res://resources/puzzle_config.gd")
-const DefaultTheme := preload("res://themes/default_theme.tres")
-const HighContrastTheme := preload("res://themes/high_contrast_theme.tres")
+
+# Lazy-loaded themes (loaded on first access)
+static var _default_theme: Theme
+static var _high_contrast_theme: Theme
+
+# StringName constants for translation keys (interned, faster lookup)
+const TR_EASY := &"EASY"
+const TR_MEDIUM := &"MEDIUM"
+const TR_HARD := &"HARD"
+const TR_TARGET_SUM := &"TARGET_SUM"
+const TR_STATUS_CORRECT := &"STATUS_CORRECT"
+const TR_STATUS_WRONG := &"STATUS_WRONG"
+const TR_STATUS_FILL := &"STATUS_FILL"
+const TR_ROW := &"ROW"
+const TR_COL := &"COL"
+const TR_DIAG_MAIN := &"DIAG_MAIN"
+const TR_DIAG_ANTI := &"DIAG_ANTI"
+const TR_A11Y_DIFFICULTY := &"A11Y_DIFFICULTY"
+const TR_A11Y_SEED := &"A11Y_SEED"
+const TR_A11Y_NEW_GAME := &"A11Y_NEW_GAME"
+const TR_A11Y_TARGET := &"A11Y_TARGET"
+const TR_A11Y_STATUS := &"A11Y_STATUS"
+const TR_A11Y_GRID := &"A11Y_GRID"
 
 @onready
 var grid_container: GridContainer = $VBoxContainer/CenterContainer/GamePanel/MarginContainer/VBoxContainer/GridContainer
@@ -57,9 +78,21 @@ func _apply_locale() -> void:
 func _apply_theme() -> void:
 	var high_contrast: bool = GameState.get_setting("high_contrast", false)
 	if high_contrast:
-		theme = HighContrastTheme
+		theme = _get_high_contrast_theme()
 	else:
-		theme = DefaultTheme
+		theme = _get_default_theme()
+
+
+static func _get_default_theme() -> Theme:
+	if not _default_theme:
+		_default_theme = load("res://themes/default_theme.tres")
+	return _default_theme
+
+
+static func _get_high_contrast_theme() -> Theme:
+	if not _high_contrast_theme:
+		_high_contrast_theme = load("res://themes/high_contrast_theme.tres")
+	return _high_contrast_theme
 
 
 func set_high_contrast(enabled: bool) -> void:
@@ -69,19 +102,19 @@ func set_high_contrast(enabled: bool) -> void:
 
 func _setup_accessibility() -> void:
 	# Godot 4.5+ screen reader support via AccessKit
-	difficulty_option.set_accessibility_name(tr("A11Y_DIFFICULTY"))
-	seed_input.set_accessibility_name(tr("A11Y_SEED"))
-	new_game_btn.set_accessibility_name(tr("A11Y_NEW_GAME"))
-	target_label.set_accessibility_name(tr("A11Y_TARGET"))
-	status_label.set_accessibility_name(tr("A11Y_STATUS"))
-	grid_container.set_accessibility_name(tr("A11Y_GRID"))
+	difficulty_option.set_accessibility_name(tr(TR_A11Y_DIFFICULTY))
+	seed_input.set_accessibility_name(tr(TR_A11Y_SEED))
+	new_game_btn.set_accessibility_name(tr(TR_A11Y_NEW_GAME))
+	target_label.set_accessibility_name(tr(TR_A11Y_TARGET))
+	status_label.set_accessibility_name(tr(TR_A11Y_STATUS))
+	grid_container.set_accessibility_name(tr(TR_A11Y_GRID))
 
 
 func _setup_difficulty_options() -> void:
 	difficulty_option.clear()
-	difficulty_option.add_item(tr("EASY"), PuzzleGen.Difficulty.EASY)
-	difficulty_option.add_item(tr("MEDIUM"), PuzzleGen.Difficulty.MEDIUM)
-	difficulty_option.add_item(tr("HARD"), PuzzleGen.Difficulty.HARD)
+	difficulty_option.add_item(tr(TR_EASY), PuzzleGen.Difficulty.EASY)
+	difficulty_option.add_item(tr(TR_MEDIUM), PuzzleGen.Difficulty.MEDIUM)
+	difficulty_option.add_item(tr(TR_HARD), PuzzleGen.Difficulty.HARD)
 	difficulty_option.select(1)  # Default to Medium
 
 
@@ -223,7 +256,7 @@ func _save_current_session() -> void:
 
 func _update_display() -> void:
 	var target: int = current_puzzle.target_sum
-	target_label.text = tr("TARGET_SUM") % target
+	target_label.text = tr(TR_TARGET_SUM) % target
 
 	# Get current grid values
 	var current_grid: Array[int] = []
@@ -243,22 +276,22 @@ func _update_display() -> void:
 	if all_filled:
 		var validation: Dictionary = PuzzleGen.validate_solution(current_grid, target)
 		if validation.valid:
-			status_label.text = tr("STATUS_CORRECT")
-			status_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.3))
+			status_label.text = tr(TR_STATUS_CORRECT)
+			status_label.add_theme_color_override(&"font_color", Color(0.2, 0.8, 0.3))
 			if not puzzle_completed:
 				puzzle_completed = true
 				var elapsed := (Time.get_ticks_msec() / 1000.0) - puzzle_start_time
 				var difficulty: int = difficulty_option.get_selected_id()
 				GameState.record_completion(difficulty, elapsed)
 		else:
-			status_label.text = tr("STATUS_WRONG")
-			status_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.3))
+			status_label.text = tr(TR_STATUS_WRONG)
+			status_label.add_theme_color_override(&"font_color", Color(0.9, 0.4, 0.3))
 
 		# Highlight cells based on validation
 		_highlight_cells(validation)
 	else:
-		status_label.text = tr("STATUS_FILL")
-		status_label.remove_theme_color_override("font_color")
+		status_label.text = tr(TR_STATUS_FILL)
+		status_label.remove_theme_color_override(&"font_color")
 		for cell in cells:
 			cell.clear_highlight()
 
@@ -267,20 +300,20 @@ func _update_sum_indicators(grid: Array[int], target: int) -> void:
 	# Row sums
 	for row in 3:
 		var sum := grid[row * 3] + grid[row * 3 + 1] + grid[row * 3 + 2]
-		row_sums[row].text = "%s: %d" % [tr("ROW") % (row + 1), sum]
+		row_sums[row].text = "%s: %d" % [tr(TR_ROW) % (row + 1), sum]
 		_color_sum_label(row_sums[row], sum, target)
 
 	# Column sums
 	for col in 3:
 		var sum := grid[col] + grid[col + 3] + grid[col + 6]
-		col_sums[col].text = "%s: %d" % [tr("COL") % (col + 1), sum]
+		col_sums[col].text = "%s: %d" % [tr(TR_COL) % (col + 1), sum]
 		_color_sum_label(col_sums[col], sum, target)
 
 	# Diagonal sums
 	var diag1 := grid[0] + grid[4] + grid[8]
 	var diag2 := grid[2] + grid[4] + grid[6]
-	diag_sums[0].text = "%s: %d" % [tr("DIAG_MAIN"), diag1]
-	diag_sums[1].text = "%s: %d" % [tr("DIAG_ANTI"), diag2]
+	diag_sums[0].text = "%s: %d" % [tr(TR_DIAG_MAIN), diag1]
+	diag_sums[1].text = "%s: %d" % [tr(TR_DIAG_ANTI), diag2]
 	_color_sum_label(diag_sums[0], diag1, target)
 	_color_sum_label(diag_sums[1], diag2, target)
 

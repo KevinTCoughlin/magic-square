@@ -3,6 +3,12 @@ extends PanelContainer
 
 signal value_changed(cell_index: int, new_value: int)
 
+# StringName constants for translation keys (interned, faster lookup)
+const TR_CELL_POS := &"A11Y_CELL_POS"
+const TR_CELL_EMPTY := &"A11Y_CELL_EMPTY"
+const TR_CELL_VALUE := &"A11Y_CELL_VALUE"
+const TR_CELL_ENTER := &"A11Y_CELL_ENTER"
+
 @export var cell_index: int = 0
 
 var correct_value: int = 0
@@ -49,7 +55,7 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 	# Accessibility: set descriptive name based on grid position
 	var row: int = cell_index / 3 + 1
 	var col: int = cell_index % 3 + 1
-	var position_desc := tr("A11Y_CELL_POS") % [row, col]
+	var position_desc := tr(TR_CELL_POS) % [row, col]
 
 	if editable:
 		label.hide()
@@ -57,17 +63,17 @@ func _apply_setup(_index: int, value: int, editable: bool) -> void:
 		input.text = ""
 		input.editable = true
 		input.placeholder_text = "?"
-		input.tooltip_text = "%s - %s" % [position_desc, tr("A11Y_CELL_ENTER")]
+		input.tooltip_text = "%s - %s" % [position_desc, tr(TR_CELL_ENTER)]
 		# Godot 4.5+ screen reader support
-		input.set_accessibility_name("%s, %s, %s" % [position_desc, tr("A11Y_CELL_EMPTY"), tr("A11Y_CELL_ENTER")])
+		input.set_accessibility_name("%s, %s, %s" % [position_desc, tr(TR_CELL_EMPTY), tr(TR_CELL_ENTER)])
 		current_value = 0
 	else:
 		input.hide()
 		label.show()
 		label.text = str(value)
-		label.tooltip_text = "%s - %s" % [position_desc, tr("A11Y_CELL_VALUE") % value]
+		label.tooltip_text = "%s - %s" % [position_desc, tr(TR_CELL_VALUE) % value]
 		# Godot 4.5+ screen reader support
-		label.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_VALUE") % value])
+		label.set_accessibility_name("%s, %s" % [position_desc, tr(TR_CELL_VALUE) % value])
 		current_value = value
 
 
@@ -124,11 +130,11 @@ func _on_text_changed(new_text: String) -> void:
 func _update_accessibility_name() -> void:
 	var row: int = cell_index / 3 + 1
 	var col: int = cell_index % 3 + 1
-	var position_desc := tr("A11Y_CELL_POS") % [row, col]
+	var position_desc := tr(TR_CELL_POS) % [row, col]
 	if current_value > 0:
-		input.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_VALUE") % current_value])
+		input.set_accessibility_name("%s, %s" % [position_desc, tr(TR_CELL_VALUE) % current_value])
 	else:
-		input.set_accessibility_name("%s, %s" % [position_desc, tr("A11Y_CELL_EMPTY")])
+		input.set_accessibility_name("%s, %s" % [position_desc, tr(TR_CELL_EMPTY)])
 
 
 func _on_input_gui_input(event: InputEvent) -> void:
