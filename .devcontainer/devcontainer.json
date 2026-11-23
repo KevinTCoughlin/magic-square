@@ -42,7 +42,7 @@
 	},
 
 	"remoteEnv": {
-		"GODOT_VERSION": "4.5.1-stable",
+		"GODOT_VERSION": "4.7.2-stable",
 		"EDITOR": "vim"
 	}
 }

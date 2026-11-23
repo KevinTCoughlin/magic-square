@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-GODOT_VERSION="${GODOT_VERSION:-4.5.1-stable}"
+GODOT_VERSION="${GODOT_VERSION:-4.7.2-stable}"
 
 # Install just (task runner)
 curl -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin

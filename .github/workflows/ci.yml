@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GODOT_VERSION: "4.5.1-stable"  # Latest stable with a11y APIs
+  GODOT_VERSION: "4.7.2-stable"
 
 jobs:
   # Single job for all checks - saves runner startup time
@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Lint first (fast, no Godot needed)
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: "pip"
@@ -50,7 +50,7 @@ jobs:
 
       # Then Godot tests
       - name: Cache Godot
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.local/share/godot
           key: godot-${{ env.GODOT_VERSION }}-${{ runner.os }}
@@ -88,7 +88,7 @@ jobs:
             artifact: magic-square.app
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
@@ -111,7 +111,7 @@ jobs:
           zip -r ../magic-square-${{ matrix.platform }}.zip .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.platform }}-build
           path: builds/magic-square-${{ matrix.platform }}.zip
@@ -127,13 +127,13 @@ jobs:
       contents: write
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: builds/
           merge-multiple: true
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: builds/*.zip
           generate_release_notes: true
