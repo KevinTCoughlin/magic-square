@@ -1,11 +1,11 @@
 # GitHub Copilot Instructions
 
-Context for GitHub Copilot on this Godot 4.5+ project.
+Context for GitHub Copilot on this Godot 4.7+ project.
 
 ## Language & Framework
 
 - **GDScript 4.x** with strict static typing
-- **Godot Engine 4.5+** (Forward+ renderer)
+- **Godot Engine 4.7+** (Forward+ renderer)
 - All functions must have type annotations
 
 ## Code Style
